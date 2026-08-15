@@ -1,0 +1,356 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Parsing Result - XML Parser Optimizer{% endblock %}
+
+{% block extra_css %}
+<style>
+    .result-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 20px 20px 0 0;
+        margin-bottom: 0;
+    }
+    
+    .result-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+        overflow: hidden;
+        animation: fadeInUp 0.6s ease-out;
+    }
+    
+    .metric-box {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        padding: 1.5rem;
+        border-radius: 15px;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+    
+    .metric-box:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+    
+    .metric-icon {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+    
+    .metric-value {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #667eea;
+        margin: 0.5rem 0;
+    }
+    
+    .metric-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+    
+    .code-container {
+        background: #2d2d2d;
+        border-radius: 15px;
+        padding: 1.5rem;
+        position: relative;
+        max-height: 500px;
+        overflow-y: auto;
+    }
+    
+    .code-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #444;
+    }
+    
+    .code-title {
+        color: #61dafb;
+        font-weight: bold;
+        font-size: 1.1rem;
+    }
+    
+    .copy-btn {
+        background: #667eea;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+    }
+    
+    .copy-btn:hover {
+        background: #764ba2;
+        transform: scale(1.05);
+    }
+    
+    .code-block {
+        background: #1e1e1e;
+        color: #d4d4d4;
+        padding: 1.5rem;
+        border-radius: 10px;
+        font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+        font-size: 0.9rem;
+        line-height: 1.6;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        overflow-x: auto;
+    }
+    
+    .confidence-badge {
+        display: inline-block;
+        padding: 0.5rem 1.5rem;
+        border-radius: 25px;
+        font-weight: bold;
+        font-size: 1.2rem;
+        animation: pulse 2s infinite;
+    }
+    
+    .confidence-high {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        color: white;
+    }
+    
+    .confidence-medium {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+    
+    .btn-action {
+        flex: 1;
+        min-width: 200px;
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+        border-radius: 12px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-action:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+    
+    .parser-info-box {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+    }
+    
+    .parser-name {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+    
+    .parser-description {
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+    
+    .complexity-low {
+        background: #28a745;
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+    }
+    
+    .complexity-medium {
+        background: #ffc107;
+        color: #212529;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+    }
+    
+    .complexity-high {
+        background: #dc3545;
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+    <div class="result-card">
+        <div class="result-header">
+            <h2><i class="fas fa-check-circle"></i> Parsing Result</h2>
+            <p class="mb-0">Optimized parser successfully generated</p>
+        </div>
+        
+        <div class="p-4">
+            <!-- Parser Information -->
+            <div class="parser-info-box">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <div class="parser-name">
+                            <i class="fas fa-code-branch"></i> {{ parser_info.name }}
+                        </div>
+                        <div class="parser-description">
+                            {{ parser_info.description }}
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <div class="mb-2">Confidence Score</div>
+                        <span class="confidence-badge {% if result.prediction_confidence >= 90 %}confidence-high{% else %}confidence-medium{% endif %}">
+                            {{ result.prediction_confidence }}%
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Metrics -->
+            <h4 class="mb-4"><i class="fas fa-chart-bar"></i> Performance Metrics</h4>
+            <div class="row mb-4">
+                <div class="col-md-3 mb-3">
+                    <div class="metric-box">
+                        <i class="fas fa-clock metric-icon text-primary"></i>
+                        <div class="metric-value">{{ result.parsing_time }}s</div>
+                        <div class="metric-label">Parsing Time</div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3 mb-3">
+                    <div class="metric-box">
+                        <i class="fas fa-memory metric-icon text-success"></i>
+                        <div class="metric-value">{{ result.memory_used }} MB</div>
+                        <div class="metric-label">Memory Used</div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3 mb-3">
+                    <div class="metric-box">
+                        <i class="fas fa-microchip metric-icon text-warning"></i>
+                        <div class="metric-value">{{ result.cpu_usage }}%</div>
+                        <div class="metric-label">CPU Usage</div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3 mb-3">
+                    <div class="metric-box">
+                        <i class="fas fa-file-code metric-icon text-info"></i>
+                        <div class="metric-value">{{ xml_file.total_elements|intcomma }}</div>
+                        <div class="metric-label">Total Elements</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- File Information -->
+            <h4 class="mb-3"><i class="fas fa-info-circle"></i> File Information</h4>
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between">
+                            <strong><i class="fas fa-file text-primary"></i> Filename:</strong>
+                            <span>{{ xml_file.original_filename }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <strong><i class="fas fa-database text-success"></i> File Size:</strong>
+                            <span>{{ xml_file.get_file_size_mb }} MB</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <strong><i class="fas fa-layer-group text-warning"></i> Max Depth:</strong>
+                            <span>{{ xml_file.max_depth }}</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between">
+                            <strong><i class="fas fa-tags text-info"></i> Attributes:</strong>
+                            <span>{{ xml_file.total_attributes|intcomma }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <strong><i class="fas fa-chart-line text-danger"></i> Complexity:</strong>
+                            <span class="complexity-{{ xml_file.file_complexity }}">{{ xml_file.file_complexity|upper }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <strong><i class="fas fa-calendar text-secondary"></i> Uploaded:</strong>
+                            <span>{{ xml_file.uploaded_at|date:"M d, Y H:i" }}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Optimized Code -->
+            <h4 class="mb-3"><i class="fas fa-code"></i> Optimized Parser Code</h4>
+            <div class="code-container">
+                <div class="code-header">
+                    <span class="code-title">
+                        <i class="fab fa-python"></i> {{ parser_info.name }} Parser Implementation
+                    </span>
+                    <button class="copy-btn" onclick="copyCode()">
+                        <i class="fas fa-copy"></i> Copy Code
+                    </button>
+                </div>
+                
+                <pre class="code-block" id="codeBlock">{{ result.optimized_code|default:"# Code generation in progress..." }}</pre>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <a href="{% url 'xml_profiler:download_code' result.pk %}" class="btn btn-success btn-action">
+                    <i class="fas fa-download"></i> Download Code
+                </a>
+                <a href="{% url 'xml_profiler:upload' %}" class="btn btn-primary btn-action">
+                    <i class="fas fa-upload"></i> Upload New File
+                </a>
+                <a href="{% url 'dashboard:home' %}" class="btn btn-secondary btn-action">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function copyCode() {
+        const codeBlock = document.getElementById('codeBlock');
+        const textArea = document.createElement('textarea');
+        textArea.value = codeBlock.textContent;
+        document.body.appendChild(textArea);
+        textArea.select();
+        
+        try {
+            document.execCommand('copy');
+            
+            // Change button text temporarily
+            const btn = event.target.closest('.copy-btn');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            btn.style.background = '#38ef7d';
+            
+            setTimeout(() => {
+                btn.innerHTML = originalHTML;
+                btn.style.background = '#667eea';
+            }, 2000);
+        } catch (err) {
+            alert('Failed to copy code');
+        }
+        
+        document.body.removeChild(textArea);
+    }
+</script>
+{% endblock %}

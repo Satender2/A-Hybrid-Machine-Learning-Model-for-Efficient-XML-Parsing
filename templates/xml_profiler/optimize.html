@@ -1,0 +1,355 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}  <!-- ADD THIS LINE -->
+
+{% block title %}Optimize Parser - XML Parser Optimizer{% endblock %}
+
+{% block extra_css %}
+<style>
+    .optimizer-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+        overflow: hidden;
+        animation: fadeInUp 0.6s ease-out;
+    }
+    
+    .card-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        text-align: center;
+    }
+    
+    .card-header h3 {
+        margin: 0;
+        font-size: 2rem;
+    }
+    
+    .file-info {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+    }
+    
+    .file-info h4 {
+        color: #667eea;
+        margin-bottom: 1rem;
+    }
+    
+    .form-group label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-control {
+        border-radius: 10px;
+        border: 2px solid #e9ecef;
+        padding: 0.75rem;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    
+    .btn-optimize {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 1rem 3rem;
+        font-size: 1.2rem;
+        border-radius: 50px;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+    
+    .btn-optimize:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    }
+    
+    .badge-low {
+        background: #28a745;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+    }
+    
+    .badge-medium {
+        background: #ffc107;
+        color: #212529;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+    }
+    
+    .badge-high {
+        background: #dc3545;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+    }
+    
+    .progress-container {
+        display: none;
+        margin: 2rem 0;
+        padding: 2rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 15px;
+        color: white;
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    }
+
+    .progress-bar-container {
+        width: 100%;
+        height: 35px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        overflow: hidden;
+        margin: 1.5rem 0;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .progress-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #11998e 0%, #38ef7d 100%);
+        transition: width 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.1rem;
+    }
+
+    .progress-details {
+        margin-top: 1.5rem;
+        font-size: 0.95rem;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .progress-item {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 0.8rem;
+        border-radius: 8px;
+    }
+
+    .parsing-spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255,255,255,0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 1s linear infinite;
+        margin-right: 10px;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    .pulse {
+        animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card optimizer-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-cog fa-spin"></i> Configure Parser Optimization</h3>
+                    <p class="mb-0">System configuration for optimal parser selection</p>
+                </div>
+                
+                <div class="card-body">
+                    <!-- File Information -->
+                    <div class="file-info">
+                        <h4><i class="fas fa-file-code"></i> Uploaded File Information</h4>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <ul class="list-unstyled">
+                                    <li><strong>Filename:</strong> {{ xml_file.original_filename }}</li>
+                                    <li><strong>File Size:</strong> {{ xml_file.get_file_size_mb }} MB</li>
+                                    <li><strong>Total Elements:</strong> {{ xml_file.total_elements|intcomma }}</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <ul class="list-unstyled">
+                                    <li><strong>Max Depth:</strong> {{ xml_file.max_depth }}</li>
+                                    <li><strong>Attributes:</strong> {{ xml_file.total_attributes|intcomma }}</li>
+                                    <li><strong>Complexity:</strong> <span class="badge badge-{{ xml_file.file_complexity }}">{{ xml_file.file_complexity|upper }}</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <!-- System Configuration Form -->
+                    <form method="post" id="optimizeForm">
+                        {% csrf_token %}
+                        
+                        <h4><i class="fas fa-server"></i> System Configuration</h4>
+                        
+                        <div class="form-group">
+                            <label for="{{ config_form.processor_cores.id_for_label }}">
+                                <i class="fas fa-microchip"></i> Processor Cores
+                            </label>
+                            {{ config_form.processor_cores }}
+                            <small class="form-text text-muted">Number of CPU cores available for processing</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ config_form.available_memory.id_for_label }}">
+                                <i class="fas fa-memory"></i> Available Memory (GB)
+                            </label>
+                            {{ config_form.available_memory }}
+                            <small class="form-text text-muted">RAM available for XML parsing</small>
+                        </div>
+
+                        <!-- Progress Container -->
+                        <div class="progress-container" id="progressContainer">
+                            <h4>
+                                <span class="parsing-spinner"></span>
+                                <span class="pulse">Parsing XML File...</span>
+                            </h4>
+                            
+                            <div class="progress-bar-container">
+                                <div class="progress-bar-fill" id="progressBar" style="width: 0%">
+                                    <span id="progressPercent">0%</span>
+                                </div>
+                            </div>
+                            
+                            <div class="progress-details">
+                                <div class="progress-item">
+                                    <strong>Status:</strong><br>
+                                    <span id="progressStatus">Initializing...</span>
+                                </div>
+                                <div class="progress-item">
+                                    <strong>Elements:</strong><br>
+                                    <span id="elementsProcessed">0</span>
+                                </div>
+                                <div class="progress-item">
+                                    <strong>Current:</strong><br>
+                                    <span id="currentElement">-</span>
+                                </div>
+                                <div class="progress-item">
+                                    <strong>Complexity:</strong><br>
+                                    <span id="parserName">{{ xml_file.file_complexity|upper }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-lg btn-optimize">
+                                <i class="fas fa-rocket"></i> Optimize Parser
+                            </button>
+                            <a href="{% url 'xml_profiler:upload' %}" class="btn btn-lg btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Back
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('optimizeForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // Show progress container
+    document.getElementById('progressContainer').style.display = 'block';
+    const btn = document.querySelector('.btn-optimize');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="parsing-spinner"></span> Processing...';
+    
+    // Simulate real-time parsing progress
+    let progress = 0;
+    const progressBar = document.getElementById('progressBar');
+    const progressPercent = document.getElementById('progressPercent');
+    const progressStatus = document.getElementById('progressStatus');
+    const elementsProcessed = document.getElementById('elementsProcessed');
+    const currentElement = document.getElementById('currentElement');
+    
+    const statuses = [
+        'Loading XML file...',
+        'Analyzing structure...',
+        'Profiling elements...',
+        'Counting nodes...',
+        'Processing data...',
+        'Calculating metrics...',
+        'Selecting optimal parser...',
+        'Generating code...',
+        'Finalizing...'
+    ];
+    
+    let statusIndex = 0;
+    let elementCount = 0;
+    const totalElements = {{ xml_file.total_elements }};
+    
+    const interval = setInterval(() => {
+        progress += Math.random() * 12;
+        if (progress > 92) progress = 92;
+        
+        progressBar.style.width = progress + '%';
+        progressPercent.textContent = Math.round(progress) + '%';
+        
+        // Update status
+        if (Math.random() > 0.6 && statusIndex < statuses.length - 1) {
+            statusIndex++;
+            progressStatus.textContent = statuses[statusIndex];
+        }
+        
+        // Update element count
+        if (elementCount < totalElements) {
+            elementCount += Math.floor(Math.random() * (totalElements / 20));
+            if (elementCount > totalElements) elementCount = totalElements;
+            elementsProcessed.textContent = elementCount.toLocaleString();
+        }
+        
+        // Update current element
+        const sampleElements = ['book', 'author', 'title', 'chapter', 'product', 'item', 'data', 'record'];
+        currentElement.textContent = '<' + sampleElements[Math.floor(Math.random() * sampleElements.length)] + '>';
+        
+        if (progress >= 92) {
+            clearInterval(interval);
+            progressStatus.textContent = 'Completing optimization...';
+            progressBar.style.width = '100%';
+            progressPercent.textContent = '100%';
+            
+            // Submit the actual form
+            setTimeout(() => {
+                e.target.submit();
+            }, 800);
+        }
+    }, 200);
+});
+</script>
+{% endblock %}

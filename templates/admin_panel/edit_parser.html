@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Edit Parser - XML Parser Optimizer{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h2><i class="fas fa-edit"></i> Edit Parser</h2>
+            <p class="text-muted">Modify parser configuration</p>
+        </div>
+    </div>
+
+    <!-- Edit Parser Form -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h5><i class="fas fa-cog"></i> Edit Parser: {{ parser.name }}</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Parser Name</label>
+                                {{ form.name }}
+                                {% if form.name.errors %}
+                                    <div class="text-danger">{{ form.name.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Description</label>
+                                {{ form.description }}
+                                {% if form.description.errors %}
+                                    <div class="text-danger">{{ form.description.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Best For</label>
+                            {{ form.best_for }}
+                            {% if form.best_for.errors %}
+                                <div class="text-danger">{{ form.best_for.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    {{ form.memory_efficient }}
+                                    <label class="form-check-label" for="{{ form.memory_efficient.id_for_label }}">
+                                        Memory Efficient
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    {{ form.speed_efficient }}
+                                    <label class="form-check-label" for="{{ form.speed_efficient.id_for_label }}">
+                                        Speed Efficient
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    {{ form.is_active }}
+                                    <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                                        Active
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save"></i> Update Parser
+                            </button>
+                            <a href="{% url 'admin_panel:parser_management' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to Parser Management
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

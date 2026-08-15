@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}System Logs - XML Parser Optimizer{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h2><i class="fas fa-list-alt"></i> System Logs</h2>
+            <p class="text-muted">View all system activity and events</p>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-body">
+                    {% if logs %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Type</th>
+                                        <th>Module</th>
+                                        <th>Message</th>
+                                        <th>User</th>
+                                        <th>Timestamp</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for log in logs %}
+                                        <tr>
+                                            <td>
+                                                <span class="badge bg-{% if log.log_type == 'ERROR' %}danger{% elif log.log_type == 'WARNING' %}warning{% elif log.log_type == 'SUCCESS' %}success{% else %}info{% endif %}">
+                                                    {{ log.log_type }}
+                                                </span>
+                                            </td>
+                                            <td><strong>{{ log.module }}</strong></td>
+                                            <td>{{ log.message }}</td>
+                                            <td>{{ log.user.username|default:"System" }}</td>
+                                            <td>{{ log.created_at|date:"M d, Y H:i:s" }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center">No logs available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

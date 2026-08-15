@@ -1,0 +1,20 @@
+{
+  "tags": {
+    "t0": "catalog",
+    "t1": "book",
+    "t2": "author",
+    "t3": "title",
+    "t4": "genre",
+    "t5": "price",
+    "t6": "publish_date",
+    "t7": "description"
+  },
+  "attributes": {
+    "a0": "id"
+  },
+  "info": {
+    "optimization_level": "heavy",
+    "total_tags": 8,
+    "total_attributes": 1
+  }
+}

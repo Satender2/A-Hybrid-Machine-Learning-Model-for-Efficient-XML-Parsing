@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Parser Management - XML Parser Optimizer{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h2><i class="fas fa-cogs"></i> Parser Management</h2>
+            <p class="text-muted">Configure and manage XML parsers</p>
+        </div>
+    </div>
+    
+    <!-- Add New Parser -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h5><i class="fas fa-plus-circle"></i> Add New Parser</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Parser Name</label>
+                                {{ form.name }}
+                                {% if form.name.errors %}
+                                    <div class="text-danger">{{ form.name.errors }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Description</label>
+                                {{ form.description }}
+                                {% if form.description.errors %}
+                                    <div class="text-danger">{{ form.description.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Best For</label>
+                            {{ form.best_for }}
+                            {% if form.best_for.errors %}
+                                <div class="text-danger">{{ form.best_for.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    {{ form.memory_efficient }}
+                                    <label class="form-check-label" for="{{ form.memory_efficient.id_for_label }}">
+                                        Memory Efficient
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    {{ form.speed_efficient }}
+                                    <label class="form-check-label" for="{{ form.speed_efficient.id_for_label }}">
+                                        Speed Efficient
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    {{ form.is_active }}
+                                    <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                                        Active
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save"></i> Add Parser
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Existing Parsers -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h5><i class="fas fa-list"></i> Existing Parsers</h5>
+                </div>
+                <div class="card-body">
+                    {% if parsers %}
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Description</th>
+                                        <th>Memory Efficient</th>
+                                        <th>Speed Efficient</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for parser in parsers %}
+                                        <tr>
+                                            <td><strong>{{ parser.name }}</strong></td>
+                                            <td>{{ parser.description|truncatewords:10 }}</td>
+                                            <td>
+                                                {% if parser.memory_efficient %}
+                                                    <i class="fas fa-check-circle text-success"></i>
+                                                {% else %}
+                                                    <i class="fas fa-times-circle text-danger"></i>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if parser.speed_efficient %}
+                                                    <i class="fas fa-check-circle text-success"></i>
+                                                {% else %}
+                                                    <i class="fas fa-times-circle text-danger"></i>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if parser.is_active %}
+                                                    <span class="badge bg-success">Active</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">Inactive</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <a href="{% url 'admin_panel:edit_parser' parser.pk %}" class="btn btn-sm btn-primary">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <form method="post" action="{% url 'admin_panel:delete_parser' parser.pk %}" style="display: inline;">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirmDelete('Delete this parser?')">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center">No parsers available. Add one above.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - XML Parser Optimizer{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h2><i class="fas fa-tachometer-alt"></i> Dashboard</h2>
+            <p class="text-muted">Welcome back, {{ user.get_full_name|default:user.username }}!</p>
+        </div>
+    </div>
+    
+    <!-- Statistics Cards -->
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card stat-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <div class="card-body text-center">
+                    <i class="fas fa-file-upload"></i>
+                    <h3>{{ total_uploads }}</h3>
+                    <p>Total Uploads</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                <div class="card-body text-center">
+                    <i class="fas fa-cogs"></i>
+                    <h3>{{ total_parsings }}</h3>
+                    <p>Parsings Done</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                <div class="card-body text-center">
+                    <i class="fas fa-clock"></i>
+                    <h3>{{ avg_parsing_time }}s</h3>
+                    <p>Avg Parse Time</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card stat-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                <div class="card-body text-center">
+                    <i class="fas fa-check-circle"></i>
+                    <h3>100%</h3>
+                    <p>Success Rate</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Activity -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card fade-in">
+                <div class="card-header">
+                    <h5><i class="fas fa-history"></i> Recent Uploads</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_uploads %}
+                        <div class="list-group">
+                            {% for upload in recent_uploads %}
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1">{{ upload.original_filename }}</h6>
+                                            <small class="text-muted">
+                                                {{ upload.get_file_size_mb }} MB | 
+                                                {{ upload.total_elements }} elements | 
+                                                Depth: {{ upload.max_depth }}
+                                            </small>
+                                        </div>
+                                        <span class="badge bg-{{ upload.file_complexity|lower }}">
+                                            {{ upload.file_complexity }}
+                                        </span>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center">No uploads yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card fade-in">
+                <div class="card-header">
+                    <h5><i class="fas fa-chart-line"></i> Parser Usage</h5>
+                </div>
+                <div class="card-body">
+                    {% if parser_stats %}
+                        {% for stat in parser_stats %}
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>{{ stat.selected_parser__name }}</span>
+                                    <span class="badge bg-primary">{{ stat.count }} times</span>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar" style="width: {{ stat.count }}0%"></div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted text-center">No parsing history yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="mb-4">Quick Actions</h5>
+                    <a href="{% url 'xml_profiler:upload' %}" class="btn btn-primary btn-lg me-2">
+                        <i class="fas fa-upload"></i> Upload New XML
+                    </a>
+                    <a href="{% url 'xml_profiler:history' %}" class="btn btn-secondary btn-lg">
+                        <i class="fas fa-history"></i> View History
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

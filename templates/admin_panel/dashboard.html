@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Admin Dashboard - XML Parser Optimizer{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h2><i class="fas fa-user-shield"></i> Admin Dashboard</h2>
+            <p class="text-muted">System overview and management</p>
+        </div>
+    </div>
+    
+    <!-- Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card stat-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <div class="card-body text-center">
+                    <i class="fas fa-users"></i>
+                    <h3>{{ total_users }}</h3>
+                    <p>Total Users</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                <div class="card-body text-center">
+                    <i class="fas fa-cogs"></i>
+                    <h3>{{ total_parsers }}</h3>
+                    <p>Active Parsers</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                <div class="card-body text-center">
+                    <i class="fas fa-file-upload"></i>
+                    <h3>{{ total_uploads }}</h3>
+                    <p>XML Files Uploaded</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card stat-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                <div class="card-body text-center">
+                    <i class="fas fa-chart-line"></i>
+                    <h3>{{ total_parsings }}</h3>
+                    <p>Total Parsings</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ML Models Status -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h5><i class="fas fa-brain"></i> ML Models Status</h5>
+                </div>
+                <div class="card-body">
+                    {% if active_models %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Model Name</th>
+                                        <th>Type</th>
+                                        <th>Accuracy</th>
+                                        <th>Precision</th>
+                                        <th>Recall</th>
+                                        <th>F1-Score</th>
+                                        <th>Status</th>
+                                        <th>Trained</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for model in active_models %}
+                                        <tr>
+                                            <td>{{ model.name }}</td>
+                                            <td><span class="badge bg-primary">{{ model.model_type }}</span></td>
+                                            <td>{{ model.accuracy|floatformat:4 }}</td>
+                                            <td>{{ model.precision|floatformat:4 }}</td>
+                                            <td>{{ model.recall|floatformat:4 }}</td>
+                                            <td>{{ model.f1_score|floatformat:4 }}</td>
+                                            <td>
+                                                {% if model.is_active %}
+                                                    <span class="badge bg-success">Active</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">Inactive</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ model.trained_at|date:"M d, Y" }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            No ML models trained yet. <a href="{% url 'admin_panel:training' %}">Train models now</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Parser Usage Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h5><i class="fas fa-chart-pie"></i> Parser Usage Distribution</h5>
+                </div>
+                <div class="card-body">
+                    {% if parser_usage %}
+                        {% for usage in parser_usage %}
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span><strong>{{ usage.selected_parser__name }}</strong></span>
+                                    <span class="badge bg-primary">{{ usage.count }} uses</span>
+                                </div>
+                                <div class="progress" style="height: 25px;">
+                                    <div class="progress-bar bg-success" style="width: {% widthratio usage.count total_parsings 100 %}%">
+                                        {% widthratio usage.count total_parsings 100 %}%
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted text-center">No parsing data available yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recent System Logs -->
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5><i class="fas fa-list-alt"></i> Recent System Logs</h5>
+                    <a href="{% url 'admin_panel:logs' %}" class="btn btn-sm btn-primary">View All</a>
+                </div>
+                <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                    {% if recent_logs %}
+                        <ul class="list-group list-group-flush">
+                            {% for log in recent_logs %}
+                                <li class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <span class="badge bg-{% if log.log_type == 'ERROR' %}danger{% elif log.log_type == 'WARNING' %}warning{% elif log.log_type == 'SUCCESS' %}success{% else %}info{% endif %}">
+                                                {{ log.log_type }}
+                                            </span>
+                                            <span class="ms-2">{{ log.message }}</span>
+                                        </div>
+                                        <small class="text-muted">{{ log.created_at|timesince }} ago</small>
+                                    </div>
+                                    <small class="text-muted">{{ log.module }}</small>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted text-center">No logs available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-body text-center">
+                    <h5 class="mb-4">Quick Actions</h5>
+                    <a href="{% url 'admin_panel:parser_management' %}" class="btn btn-primary btn-lg me-2">
+                        <i class="fas fa-cogs"></i> Manage Parsers
+                    </a>
+                    <a href="{% url 'admin_panel:training' %}" class="btn btn-success btn-lg me-2">
+                        <i class="fas fa-brain"></i> Train Models
+                    </a>
+                    <a href="{% url 'admin_panel:logs' %}" class="btn btn-info btn-lg">
+                        <i class="fas fa-list"></i> View Logs
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

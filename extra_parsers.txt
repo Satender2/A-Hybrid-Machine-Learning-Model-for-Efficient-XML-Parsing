@@ -1,0 +1,24 @@
+Additional XML Parsers:
+1.Xerces
+    Developed by Apache Software Foundation
+    Java-based XML parser
+    Supports DOM and SAX
+    Very standards compliant
+
+Best For:
+Enterprise Java applications
+
+2.Expat
+    Written in C
+    Very fast
+    Streaming (SAX-style)
+
+Best For:
+Low-level systems & embedded systems
+
+3.libxml2
+    C library
+    Very powerful
+    Used internally by lxml
+Best For:
+High-performance systems

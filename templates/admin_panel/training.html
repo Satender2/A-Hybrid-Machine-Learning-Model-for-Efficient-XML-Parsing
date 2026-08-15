@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}ML Training - XML Parser Optimizer{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h2><i class="fas fa-brain"></i> Machine Learning Training</h2>
+            <p class="text-muted">Manage training datasets and ML models</p>
+        </div>
+    </div>
+    
+    <!-- Upload Training Dataset -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h5><i class="fas fa-database"></i> Upload Training Dataset</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Dataset File (CSV)</label>
+                            {{ dataset_form.dataset_file }}
+                            {% if dataset_form.dataset_file.errors %}
+                                <div class="text-danger">{{ dataset_form.dataset_file.errors }}</div>
+                            {% endif %}
+                            <small class="form-text text-muted">CSV file with columns: file_size_mb, total_elements, max_depth, processor_cores, best_parser</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            {{ dataset_form.description }}
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-upload"></i> Upload Dataset
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Train Models -->
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h5><i class="fas fa-cogs"></i> Train ML Models</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'admin_panel:train_model' %}">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Select Dataset</label>
+                            {{ training_form.dataset }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Model Type</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="model_type" value="ANN" id="ann" checked>
+                                <label class="form-check-label" for="ann">
+                                    Artificial Neural Network (ANN)
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="model_type" value="SVM" id="svm">
+                                <label class="form-check-label" for="svm">
+                                    Support Vector Machine (SVM)
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="model_type" value="BOTH" id="both">
+                                <label class="form-check-label" for="both">
+                                    Train Both Models
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            Training may take a few minutes depending on dataset size.
+                        </div>
+                        
+                        <button type="submit" class="btn btn-success w-100">
+                            <i class="fas fa-play"></i> Start Training
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Training Datasets -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h5><i class="fas fa-folder"></i> Training Datasets</h5>
+                </div>
+                <div class="card-body">
+                    {% if datasets %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Filename</th>
+                                        <th>Records</th>
+                                        <th>Description</th>
+                                        <th>Uploaded By</th>
+                                        <th>Uploaded At</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for dataset in datasets %}
+                                        <tr>
+                                            <td><i class="fas fa-file-csv text-success"></i> {{ dataset.filename }}</td>
+                                            <td><span class="badge bg-primary">{{ dataset.total_records }} rows</span></td>
+                                            <td>{{ dataset.description|truncatewords:15 }}</td>
+                                            <td>{{ dataset.uploaded_by.username }}</td>
+                                            <td>{{ dataset.uploaded_at|date:"M d, Y H:i" }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center">No datasets uploaded yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Trained Models -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h5><i class="fas fa-robot"></i> Trained ML Models</h5>
+                </div>
+                <div class="card-body">
+                    {% if ml_models %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Model Name</th>
+                                        <th>Type</th>
+                                        <th>Accuracy</th>
+                                        <th>Precision</th>
+                                        <th>Recall</th>
+                                        <th>F1-Score</th>
+                                        <th>Status</th>
+                                        <th>Trained</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for model in ml_models %}
+                                        <tr>
+                                            <td>{{ model.name }}</td>
+                                            <td><span class="badge bg-{% if model.model_type == 'ANN' %}primary{% else %}success{% endif %}">{{ model.model_type }}</span></td>
+                                            <td>{{ model.accuracy|floatformat:4 }}</td>
+                                            <td>{{ model.precision|floatformat:4 }}</td>
+                                            <td>{{ model.recall|floatformat:4 }}</td>
+                                            <td>{{ model.f1_score|floatformat:4 }}</td>
+                                            <td>
+                                                {% if model.is_active %}
+                                                    <span class="badge bg-success">Active</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">Inactive</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ model.trained_at|date:"M d, Y" }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning text-center">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            No models trained yet. Upload a dataset and train models above.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,668 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Welcome - XML Parser Optimizer{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Override base.html background for landing page */
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    /* Custom Navigation for Landing Page */
+    .landing-nav {
+        background: rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(10px);
+        padding: 1rem 0;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .landing-nav .navbar-brand {
+        color: white;
+        font-weight: bold;
+        font-size: 1.5rem;
+    }
+    
+    .landing-nav .nav-link {
+        color: rgba(255, 255, 255, 0.9);
+        margin: 0 10px;
+        transition: all 0.3s ease;
+    }
+    
+    .landing-nav .nav-link:hover {
+        color: white;
+        transform: translateY(-2px);
+    }
+    
+    /* Hero Section */
+    .hero-section {
+        padding: 120px 0 80px;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120"><path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".25"/><path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" opacity=".5"/><path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z"/></svg>') no-repeat bottom;
+        background-size: cover;
+        opacity: 0.2;
+    }
+    
+    .hero-content {
+        position: relative;
+        z-index: 1;
+        animation: fadeInUp 1s ease-out;
+    }
+    
+    .hero-title {
+        font-size: 4rem;
+        font-weight: 800;
+        margin-bottom: 1.5rem;
+        text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+        animation: fadeInDown 1.2s ease-out;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.4rem;
+        margin-bottom: 2.5rem;
+        opacity: 0.95;
+        animation: fadeInUp 1.4s ease-out;
+    }
+    
+    .hero-buttons {
+        animation: fadeInUp 1.6s ease-out;
+    }
+    
+    .btn-hero {
+        padding: 15px 45px;
+        font-size: 1.2rem;
+        border-radius: 50px;
+        margin: 10px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    .btn-hero:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+    
+    .hero-icon {
+        font-size: 15rem;
+        opacity: 0.8;
+        animation: float 3s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-20px);
+        }
+    }
+    
+    /* Features Section */
+    .features-section {
+        padding: 80px 0;
+        background: white;
+    }
+    
+    .feature-card {
+        background: white;
+        border-radius: 20px;
+        padding: 40px 30px;
+        height: 100%;
+        transition: all 0.4s ease;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-15px) scale(1.05);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+    }
+    
+    .feature-icon {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 25px;
+        font-size: 2.5rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        animation: pulse 2s infinite;
+    }
+    
+    /* How It Works */
+    .how-it-works {
+        padding: 80px 0;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    }
+    
+    .step-card {
+        text-align: center;
+        padding: 40px 20px;
+        background: white;
+        border-radius: 20px;
+        transition: all 0.3s ease;
+        height: 100%;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    }
+    
+    .step-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+    }
+    
+    .step-number {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        font-weight: bold;
+        margin: 0 auto 25px;
+        box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        animation: bounceIn 1s;
+    }
+    
+    .step-icon {
+        font-size: 3.5rem;
+        margin: 20px 0;
+        display: inline-block;
+        animation: bounce 2s infinite;
+    }
+    
+    /* Stats Section */
+    .stats-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 80px 0;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stats-section::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        animation: rotate 20s linear infinite;
+    }
+    
+    .stat-box {
+        text-align: center;
+        padding: 30px;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .stat-number {
+        font-size: 4rem;
+        font-weight: bold;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+        animation: countUp 2s ease-out;
+    }
+    
+    @keyframes countUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* About Section */
+    .about-section {
+        padding: 80px 0;
+        background: white;
+    }
+    
+    .about-icon {
+        font-size: 12rem;
+        color: #667eea;
+        opacity: 0.7;
+        animation: pulse 3s ease-in-out infinite;
+    }
+    
+    /* CTA Section */
+    .cta-section {
+        padding: 80px 0;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    }
+    
+    /* Footer */
+    .landing-footer {
+        background: #212529;
+        color: white;
+        padding: 50px 0 30px;
+    }
+    
+    .social-icon {
+        display: inline-block;
+        width: 50px;
+        height: 50px;
+        line-height: 50px;
+        text-align: center;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        margin: 0 10px;
+        transition: all 0.3s ease;
+    }
+    
+    .social-icon:hover {
+        background: white;
+        color: #667eea;
+        transform: translateY(-5px);
+    }
+    
+    /* Animations */
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes rotate {
+        from {
+            transform: rotate(0deg);
+        }
+        to {
+            transform: rotate(360deg);
+        }
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 2.5rem;
+        }
+        .hero-subtitle {
+            font-size: 1.1rem;
+        }
+        .hero-icon {
+            font-size: 8rem;
+        }
+        .stat-number {
+            font-size: 2.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Custom Navigation -->
+<nav class="landing-nav">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <a class="navbar-brand" href="{% url 'accounts:landing' %}">
+                <i class="fas fa-code"></i> XML Parser Optimizer
+            </a>
+            <div>
+                <a class="nav-link d-inline-block" href="#features">Features</a>
+                <a class="nav-link d-inline-block" href="#how-it-works">How It Works</a>
+                <a class="nav-link d-inline-block" href="#about">About</a>
+                <a class="btn btn-outline-light mx-2" href="{% url 'accounts:login' %}">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </a>
+                <a class="btn btn-light" href="{% url 'accounts:register' %}">
+                    <i class="fas fa-user-plus"></i> Sign Up
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 hero-content">
+                <h1 class="hero-title">
+                    AI-Powered XML Parser Selection
+                </h1>
+                <p class="hero-subtitle">
+                    Automatically select the optimal XML parser using Machine Learning (ANN & SVM) based on your file characteristics and system configuration.
+                </p>
+                <div class="hero-buttons">
+                    <a href="{% url 'accounts:register' %}" class="btn btn-light btn-hero">
+                        <i class="fas fa-rocket"></i> Get Started Free
+                    </a>
+                    <a href="#features" class="btn btn-outline-light btn-hero">
+                        <i class="fas fa-info-circle"></i> Learn More
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center">
+                <i class="fas fa-brain hero-icon"></i>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section" id="features">
+    <div class="container">
+        <div class="text-center mb-5 animate__animated animate__fadeIn">
+            <h2 class="display-4 fw-bold">Powerful Features</h2>
+            <p class="lead text-muted">Everything you need for optimal XML parsing</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4 animate__animated animate__fadeInUp" style="animation-delay: 0.1s;">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h4 class="mb-3">ML-Based Selection</h4>
+                    <p class="text-muted">Uses Artificial Neural Networks (ANN) and Support Vector Machines (SVM) to predict the best parser for your XML files.</p>
+                </div>
+            </div>
+            
+            <div class="col-md-4 animate__animated animate__fadeInUp" style="animation-delay: 0.2s;">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-upload"></i>
+                    </div>
+                    <h4 class="mb-3">Easy File Upload</h4>
+                    <p class="text-muted">Upload XML files of any size and structure. System automatically profiles and analyzes your files.</p>
+                </div>
+            </div>
+            
+            <div class="col-md-4 animate__animated animate__fadeInUp" style="animation-delay: 0.3s;">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <h4 class="mb-3">Code Generation</h4>
+                    <p class="text-muted">Automatically generates optimized parser code that you can download and use in your projects.</p>
+                </div>
+            </div>
+            
+            <div class="col-md-4 animate__animated animate__fadeInUp" style="animation-delay: 0.4s;">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h4 class="mb-3">Performance Metrics</h4>
+                    <p class="text-muted">View detailed parsing time, memory usage, and efficiency metrics for better insights.</p>
+                </div>
+            </div>
+            
+            <div class="col-md-4 animate__animated animate__fadeInUp" style="animation-delay: 0.5s;">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                    <h4 class="mb-3">Multiple Parsers</h4>
+                    <p class="text-muted">Supports DOM, SAX, StAX, ElementTree, and lxml parsers for comprehensive coverage.</p>
+                </div>
+            </div>
+            
+            <div class="col-md-4 animate__animated animate__fadeInUp" style="animation-delay: 0.6s;">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h4 class="mb-3">Secure & Reliable</h4>
+                    <p class="text-muted">Built with Django framework ensuring security, scalability, and reliability.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="how-it-works" id="how-it-works">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-4 fw-bold">How It Works</h2>
+            <p class="lead text-muted">Simple 4-step process to optimize your XML parsing</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-3">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <i class="fas fa-upload step-icon text-primary"></i>
+                    <h5 class="mb-3">Upload XML File</h5>
+                    <p class="text-muted">Upload your XML file to the system</p>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <i class="fas fa-search step-icon text-success"></i>
+                    <h5 class="mb-3">Auto Profiling</h5>
+                    <p class="text-muted">System analyzes file characteristics</p>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <i class="fas fa-magic step-icon text-warning"></i>
+                    <h5 class="mb-3">ML Prediction</h5>
+                    <p class="text-muted">AI selects optimal parser</p>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <i class="fas fa-download step-icon text-info"></i>
+                    <h5 class="mb-3">Download Code</h5>
+                    <p class="text-muted">Get optimized parser code</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="stats-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="stat-box animate__animated animate__zoomIn" style="animation-delay: 0.1s;">
+                    <div class="stat-number">5</div>
+                    <h5>XML Parsers</h5>
+                    <p>DOM, SAX, StAX, ElementTree, lxml</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-box animate__animated animate__zoomIn" style="animation-delay: 0.2s;">
+                    <div class="stat-number">2</div>
+                    <h5>ML Models</h5>
+                    <p>ANN & SVM Algorithms</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-box animate__animated animate__zoomIn" style="animation-delay: 0.3s;">
+                    <div class="stat-number">92%</div>
+                    <h5>Accuracy</h5>
+                    <p>High Prediction Accuracy</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-box animate__animated animate__zoomIn" style="animation-delay: 0.4s;">
+                    <div class="stat-number">100%</div>
+                    <h5>Free to Use</h5>
+                    <p>No Hidden Charges</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- About Section -->
+<section class="about-section" id="about">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h2 class="display-5 fw-bold mb-4">About This Project</h2>
+                <p class="lead mb-4">
+                    XML Parser Optimizer is an intelligent system that leverages Machine Learning to automatically select the most efficient XML parser for your specific use case.
+                </p>
+                <p class="mb-4">
+                    Built with Django and powered by Artificial Neural Networks (ANN) and Support Vector Machines (SVM), this system analyzes your XML file characteristics such as file size, element count, tree depth, and system resources to predict the optimal parser.
+                </p>
+                <ul class="list-unstyled">
+                    <li class="mb-3"><i class="fas fa-check-circle text-success fa-lg me-3"></i> Machine Learning Integration</li>
+                    <li class="mb-3"><i class="fas fa-check-circle text-success fa-lg me-3"></i> Automatic Code Generation</li>
+                    <li class="mb-3"><i class="fas fa-check-circle text-success fa-lg me-3"></i> Performance Visualization</li>
+                    <li class="mb-3"><i class="fas fa-check-circle text-success fa-lg me-3"></i> Admin Management Panel</li>
+                    <li class="mb-3"><i class="fas fa-check-circle text-success fa-lg me-3"></i> Real-time Analysis</li>
+                </ul>
+            </div>
+            <div class="col-lg-6 text-center">
+                <i class="fas fa-laptop-code about-icon"></i>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+    <div class="container text-center">
+        <h2 class="display-5 fw-bold mb-4 animate__animated animate__fadeIn">Ready to Optimize Your XML Parsing?</h2>
+        <p class="lead mb-5 animate__animated animate__fadeIn" style="animation-delay: 0.2s;">
+            Join now and experience the power of AI-driven parser selection
+        </p>
+        <div class="animate__animated animate__fadeInUp" style="animation-delay: 0.4s;">
+            <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-hero">
+                <i class="fas fa-rocket"></i> Get Started Now
+            </a>
+            <a href="{% url 'accounts:login' %}" class="btn btn-outline-primary btn-hero">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="landing-footer">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-md-4 mb-3">
+                <h5><i class="fas fa-code"></i> XML Parser Optimizer</h5>
+                <p class="text-white">AI-Powered XML parsing optimization using Machine Learning</p>
+            </div>
+            <div class="text-white col-md-4 mb-3">
+                <h6 class="mb-3">Quick Links</h6>
+                <ul class=" text-white">
+                    <li class="mb-2"><a href="#features" class="text-white text-decoration-none"><i class="fas fa-angle-right"></i> Features</a></li>
+                    <li class="mb-2"><a href="#how-it-works" class="text-white text-decoration-none"><i class="fas fa-angle-right"></i> How It Works</a></li>
+                    <li class="mb-2"><a href="#about" class="text-white text-decoration-none"><i class="fas fa-angle-right"></i> About</a></li>
+                </ul>
+            </div>
+            <div class="col-md-4 mb-3">
+                <h6 class="mb-3">Get Started</h6>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="{% url 'accounts:login' %}" class="text-white text-decoration-none"><i class="fas fa-sign-in-alt"></i> Login</a></li>
+                    <li class="mb-2"><a href="{% url 'accounts:register' %}" class="text-white text-decoration-none"><i class="fas fa-user-plus"></i> Register</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <hr class="bg-secondary">
+        
+        <div class="row align-items-center">
+            <div class="col-md-6 text-center text-md-start">
+                <p class="mb-0">&copy; 2026 XML Parser Optimizer. All rights reserved.</p>
+            </div>
+            <div class="col-md-6 text-center text-md-end">
+                <a href="#" class="social-icon text-white text-decoration-none">
+                    <i class="fab fa-github"></i>
+                </a>
+                <a href="#" class="social-icon text-white text-decoration-none">
+                    <i class="fab fa-linkedin"></i>
+                </a>
+                <a href="#" class="social-icon text-white text-decoration-none">
+                    <i class="fab fa-twitter"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</footer>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+    
+    // Add scroll animation to elements
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -100px 0px'
+    };
+    
+    const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('animate__animated', 'animate__fadeInUp');
+            }
+        });
+    }, observerOptions);
+    
+    document.querySelectorAll('.feature-card, .step-card, .stat-box').forEach(el => {
+        observer.observe(el);
+    });
+</script>
+{% endblock %}
